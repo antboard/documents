@@ -1,0 +1,94 @@
+1. js对null的调用会导致程序死掉。对所有传入的参数，进行必要的判断
+	if（obj == null）
+
+2. 使用数组的长度来判断数组还是对象，
+	2.1 if（obj.length == +obj.length)
+		验证如下：
+			var obj0 = {};
+			alert(obj0.length);// undefind
+			alert(+obj0.length);// NaN
+			alert(obj0.length === +obj0.length);// false
+
+			var obj1 = [];
+			alert(obj1.length);// 0
+			alert(obj1.length === +obj1.length);//true
+	2.2 系统提供了本地的方法 Array.isArray
+	2.3 基类 Object.prototype.toString提供了类标记  === '[object Array]'
+
+	2.4 typeof 为什么不能判断呢？返回值是object
+		var v = Array(10);
+		alert(v.length === +v.length); 				// ture
+		alert(Array.isArray(v));					// true
+		alert(Object.prototype.toString(v));		//[object Object]
+		var toString = Object.prototype.toString;
+		alert(toString.call(v));					//[object Array]
+		alert(typeof v);							// false
+		var x = 10;
+		alert(typeof x);							// number
+
+3. context不是系统关键字???
+
+	function t(context){
+		alert(context);	// undefine
+	}
+	t();
+
+4. 将对象的成员变量转换成数组访问／遍历
+	4.1 系统提供了原生的方法 nativerKeys ＝ Object.keys
+	4.2 使用for (var key in obj)方法自动获取成员变量的值，注意，这里必须做key === null？？
+
+5. js的函数调用参数存在不确定性，如果是一个过滤函数，那尽量使用arguments来配合apply传递参数
+
+6. groupby／indexby／countby 设计：
+	6.1 传入参数是obj或arrary，分组方法，环境
+	6.2 需要对每一个数据调用分组方法，根据返回值进行不同处理
+	6.3 换一种思考方式：采用回调函数的方式设计这个算分。抽取一个相同对group函数，作为参数，将g／i／c的不同处理进行传入，作为回调函数。
+	6.4 当然，group根据不同的传入参数也进行了处理，回调了不同的封装方法，
+
+7. 将数组还原成对象_.object
+	使用result = {};result[name]=value;进行访问
+
+8. 函数调用返回一个函数，这个函数执行的时候this是谁？？arguments又是谁？
+	8.1 这个函数没有执行。是一个成员函数。
+		function F(){
+			name = "f()";
+			var rtf = function(){
+				alert(this.name);
+			}
+			return rtf;
+		}
+		name = "globle";
+		var newf = F(); // 无任何输出
+		newf();// 输出f()
+	8.2 据测试，参数就是调用时的参数。
+
+9. partial 进行了参数预绑定，对于不绑定的时用_对象作为占位符。最后执行时从真正的参数从前面开始替换。看起来设计还是很不错的。
+
+10. _.throttle 延迟执行 函数。
+	10.1 无参数option版本。
+		第一次调用的时候，启动延迟timeout函数来延时
+		第二次调用判断执行状态，如果还没到时候，则跳过。如果已经超时，却还没执行，那就删除超时回调，直接调用。
+		如果延时较长，则按第一次触发＋延迟后执行。
+		如果延迟比较短，第二次触发会因为与上一次间隔太多，而立即执行。默认leading是false所以，不会出现此情况。
+	10.2 option.leading 
+		false：每次触发结束后清除状态量保证是全新环境。
+		true：	上次调用后，记录调用发生时间，保证下个周期之内的触发都能周期执行。周期内没触发，周期外的触发，则直接执行。更注重周期性。
+	10.3 option.trailing
+		false: 正常使用。使用timeout触发。
+		true: 看起来像测试版本，使用单线程，多次调用超过延时周期会触发。
+11.  _.debounce 延迟执行，以最后一次调用为准
+	11.1 每次调用更新时间戳，在执行的时候确认最后一次时间戳，然后更新真正的调用时间。
+
+12. _.pairs 将对象转成数组对。
+
+13. _.pick 中obj = new Object(obj);是什么原因呢？有什么优势？
+
+14. 判断对象里有没有某个成员
+	if (obj[prop] === void 0)
+	if (prop in obj)
+	hasOwnProperty.call(source, prop)
+15. 数组中是否包含某个元素
+	循环比较
+
+
+
